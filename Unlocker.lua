@@ -1,9 +1,9 @@
 -- ⚡ RIVALS UNLOCK ALL — AUTO-LOAD EDITION
--- Features: Anti-dupe | Autoexec Save | Teleport Persist | Mobile UI
+-- GitHub: https://github.com/makarmatvij7-svg/Rivals-unlock
+-- Raw URL: https://raw.githubusercontent.com/makarmatvij7-svg/Rivals-unlock/main/Unlocker.lua
 
 -- ========== AUTO-LOAD / ANTI-DUPE ==========
 if getgenv().RivalsUnlockerLoaded then
-    -- Already running, just make sure UI is visible
     if getgenv().RivalsUnlockerGui and getgenv().RivalsUnlockerGui.Parent then
         getgenv().RivalsUnlockerGui.Enabled = true
     end
@@ -28,12 +28,10 @@ local autoexecPaths = {
 }
 
 local function getScriptSource()
-    -- Try to get our own source for auto-save
     if getscript then
         local s = getscript()
         if s and s.Source then return s.Source end
     end
-    -- Fallback: return a placeholder loadstring template
     return nil
 end
 
@@ -41,8 +39,7 @@ local function saveToAutoexec()
     if not writefile then return false, "Executor doesn't support writefile" end
     local source = getScriptSource()
     if not source then
-        -- If we can't grab source, write a loader that tells user to paste script
-        source = '-- Rivals Unlocker Loader\n-- PASTE THE FULL SCRIPT HERE OR USE loadstring(game:HttpGet("YOUR_URL"))()\n'
+        source = '-- Rivals Unlocker Loader\nloadstring(game:HttpGet("https://raw.githubusercontent.com/makarmatvij7-svg/Rivals-unlock/main/Unlocker.lua"))()\n'
     end
     local saved = false
     for _, path in ipairs(autoexecPaths) do
@@ -71,7 +68,7 @@ local function doUnlockAll()
     if unlockRan then return true end
     unlockRan = true
 
-    local success, err = pcall(function()
+    local success = pcall(function()
         local playerScripts = player:WaitForChild("PlayerScripts", 10)
         if not playerScripts then return end
         local controllers = playerScripts:WaitForChild("Controllers", 10)
@@ -403,7 +400,6 @@ gui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
 gui.Parent = playerGui
 getgenv().RivalsUnlockerGui = gui
 
--- Open Button
 local openBtn = Instance.new("TextButton")
 openBtn.Name = "OpenBtn"
 openBtn.Size = UDim2.new(0, 50, 0, 50)
@@ -433,7 +429,6 @@ task.spawn(function()
     end
 end)
 
--- Main Panel
 local panelW = isMobile and 320 or 400
 local panelH = isMobile and 460 or 540
 
@@ -541,7 +536,6 @@ status.Font = Enum.Font.GothamBold
 status.TextXAlignment = Enum.TextXAlignment.Center
 status.Parent = content
 
--- Unlock Button
 local unlockBtn = Instance.new("TextButton")
 unlockBtn.Name = "UnlockBtn"
 unlockBtn.Size = UDim2.new(1, 0, 0, 56)
@@ -578,11 +572,10 @@ unlockBtn.MouseButton1Up:Connect(function()
     TweenService:Create(unlockBtn, TweenInfo.new(0.15, Enum.EasingStyle.Back), {Size = UDim2.new(1, 0, 0, 56)}):Play()
 end)
 
--- Feature list
 local features = {
     "✓ All Weapon Skins",
     "✓ All Wraps",
-    "✓ All Charms", 
+    "✓ All Charms",
     "✓ All Finishers",
     "✓ Save & Load Config",
     "✓ Works in-game & lobby"
@@ -602,7 +595,6 @@ for i, feat in ipairs(features) do
     f.Parent = content
 end
 
--- ========== AUTO-LOAD SECTION ==========
 local autoY = yOff + #features * 26 + 16
 
 local autoHeader = Instance.new("TextLabel")
@@ -616,7 +608,6 @@ autoHeader.Font = Enum.Font.GothamBold
 autoHeader.TextXAlignment = Enum.TextXAlignment.Left
 autoHeader.Parent = content
 
--- Helper for toggle row
 local function makeToggleRow(parent, y, labelText, defaultState, onToggle)
     local row = Instance.new("Frame")
     row.Size = UDim2.new(1, 0, 0, 32)
@@ -701,7 +692,7 @@ local function makeToggleRow(parent, y, labelText, defaultState, onToggle)
     return row
 end
 
--- Auto Execute Toggle (saves to autoexec folder)
+-- Auto Execute Toggle
 makeToggleRow(content, autoY + 24, "Auto Execute on Join", false, function(enabled)
     if enabled then
         local ok, msg = saveToAutoexec()
@@ -719,19 +710,11 @@ makeToggleRow(content, autoY + 24, "Auto Execute on Join", false, function(enabl
     end
 end)
 
--- Teleport Persist Toggle (queue_on_teleport)
+-- Teleport Persist Toggle (FIXED with real URL)
 makeToggleRow(content, autoY + 62, "Persist on Teleport", false, function(enabled)
     if enabled and queue_on_teleport then
-        -- Store script in getgenv so we can reference it for teleport
         getgenv().RivalsUnlockerAutoLoad = true
-        queue_on_teleport([[
-            if not getgenv().RivalsUnlockerLoaded then
-                -- Replace this loadstring with your script URL, or paste the full script here
-                -- Example: loadstring(game:HttpGet("https://pastebin.com/raw/XXXX"))()
-                -- For now, we just set a flag. Paste the FULL script inside this string for standalone use.
-                getgenv().RivalsUnlockerQueued = true
-            end
-        ]])
+        queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/makarmatvij7-svg/Rivals-unlock/main/Unlocker.lua"))()]])
         status.Text = "✅ Teleport persist enabled!"
         status.TextColor3 = COL.success
     elseif enabled and not queue_on_teleport then
@@ -744,12 +727,11 @@ makeToggleRow(content, autoY + 62, "Persist on Teleport", false, function(enable
     end
 end)
 
--- Note
 local note = Instance.new("TextLabel")
 note.Size = UDim2.new(1, 0, 0, 40)
 note.Position = UDim2.new(0, 0, 1, -40)
 note.BackgroundTransparency = 1
-note.Text = "Tip: Enable both for full auto-load.\nFor teleport, host script on GitHub/Pastebin."
+note.Text = "Tip: Enable both for full auto-load.\nGitHub: makarmatvij7-svg/Rivals-unlock"
 note.TextColor3 = COL.dim
 note.TextSize = 9
 note.Font = Enum.Font.Gotham
@@ -757,7 +739,6 @@ note.TextXAlignment = Enum.TextXAlignment.Center
 note.TextWrapped = true
 note.Parent = content
 
--- Unlock logic
 unlockBtn.MouseButton1Click:Connect(function()
     if unlockRan then
         status.Text = "✅ Already unlocked!"
@@ -792,7 +773,6 @@ unlockBtn.MouseButton1Click:Connect(function()
     end)
 end)
 
--- Open/Close
 openBtn.MouseButton1Click:Connect(function()
     openBtn.Visible = false
     panel.Visible = true
@@ -829,7 +809,6 @@ do
     end)
 end
 
--- Entrance
 task.spawn(function()
     task.wait(0.2)
     openBtn.Size = UDim2.new(0, 0, 0, 0)
@@ -838,4 +817,9 @@ task.spawn(function()
     }):Play()
 end)
 
-print("Rivals Unlocker Auto-Load Edition ready!")
+-- ========== AUTOMATIC TELEPORT PERSIST ==========
+if queue_on_teleport then
+    queue_on_teleport([[loadstring(game:HttpGet("https://raw.githubusercontent.com/makarmatvij7-svg/Rivals-unlock/main/Unlocker.lua"))()]])
+end
+
+print("Rivals Unlocker loaded from GitHub! URL: https://raw.githubusercontent.com/makarmatvij7-svg/Rivals-unlock/main/Unlocker.lua")
